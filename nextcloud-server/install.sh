@@ -84,6 +84,17 @@ else
     echo "Directory '/opt/M122/nextcloud' created with 'm122' as the owner."
 fi
 
+# Check if directory '/opt/M122/db' exists
+if [ -d "/opt/M122/db" ]; then
+    echo "Directory '/opt/M122/db' already exists."
+else
+    # Create directory '/opt/M122/db' and set ownership
+    sudo mkdir -p /opt/M122/db
+    sudo chown m122:m122 /opt/M122/db
+
+    echo "Directory '/opt/M122/db' created with 'm122' as the owner."
+fi
+
 # Check if directory '/opt/M122/syncthing' exists
 if [ -d "/opt/M122/syncthing" ]; then
     echo "Directory '/opt/M122/syncthing' already exists."
