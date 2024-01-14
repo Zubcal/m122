@@ -113,3 +113,10 @@ if [ ! -f "/opt/M122/docker/docker-compose.yaml" ]; then
 else
     echo "docker-compose.yaml already exists in '/opt/M122/docker'."
 fi
+
+if [ ! -f "/opt/M122/docker/.env" ]; then
+    sudo wget -O /opt/M122/docker/env https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/.env
+    echo ".env downloaded to '/opt/M122/docker'."
+else
+    echo ".env already exists in '/opt/M122/docker'."
+fi
