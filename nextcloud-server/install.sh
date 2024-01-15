@@ -79,7 +79,7 @@ if [ -d "/opt/M122/nextcloud" ]; then
 else
     # Create directory '/opt/M122/nextcloud' and set ownership
     sudo mkdir -p /opt/M122/nextcloud
-    sudo chown m122:m122 /opt/M122/nextcloud
+    sudo chown www-data:www-data /opt/M122/nextcloud
 
     echo "Directory '/opt/M122/nextcloud' created with 'm122' as the owner."
 fi
