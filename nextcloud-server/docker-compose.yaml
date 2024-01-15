@@ -38,8 +38,6 @@ services:
     container_name: nextcloud
     hostname: nextcloud-main-node
     environment:
-      - PUID=1000
-      - PGID=1000
       - TZ=Europe/Zurich
       - POSTGRES_HOST=db
       - POSTGRES_DB=${POSTGRES_DB}
