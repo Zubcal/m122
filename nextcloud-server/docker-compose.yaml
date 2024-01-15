@@ -22,8 +22,6 @@ services:
     container_name: postgres-main-node
     hostname: postgres-main-node
     environment: 
-      - PUID=1000
-      - PGID=1000
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
