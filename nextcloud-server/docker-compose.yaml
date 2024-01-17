@@ -8,33 +8,38 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Zurich
-    volumes:
-      - /opt/M122/syncthing/config:/syncthing/config
     ports:
       - 8384:8384 # Web UI
       - 22000:22000/tcp # TCP file transfers
       - 22000:22000/udp # QUIC file transfers
       - 21027:21027/udp # Receive local discovery broadcasts
     restart: unless-stopped
-    
+
   db:
     image: postgres:15.3
     container_name: postgres-main-node
     hostname: postgres-main-node
-    environment: 
+    environment:
+      - PUID=1000
+      - PGID=1000
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=Europe/Zurich
-    volumes:
-      - /opt/M122/db:/var/lib/postgresql/data
     ports:
       - 5432:5432
-      
+
   nextcloud:
     image: nextcloud:27.1.3
     container_name: nextcloud
     hostname: nextcloud-main-node
+    depends_on:
+      - db
+    volumes:
+      - /opt/M122/nextcloud/data:/var/www/html/
+      - /opt/M122/nextcloud/logs:/var/log/
+      - /opt/M122/nextcloud/docker:/docker-entrypoint-hooks.d/before-starting/
+
     environment:
       - TZ=Europe/Zurich
       - POSTGRES_HOST=db
@@ -43,8 +48,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
       - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
-    volumes:
-      - /opt/M122/nextcloud/:/var/www/html/
     ports:
       - 1443:443
       - 1880:80
