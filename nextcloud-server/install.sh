@@ -3,7 +3,7 @@
 # Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
 server_ip=$(hostname -I | awk '{print $1}')
 check_nextcloud_status() {
-    status_output=$(sudo docker exec -t --user www-data nextcloud /var/www/html/occ status > /dev/null)
+    status_output=$(sudo docker exec -t --user www-data nextcloud /var/www/html/occ status)
     
     echo "Nextcloud Status:"
     echo "$status_output"
