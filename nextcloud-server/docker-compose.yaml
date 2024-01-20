@@ -9,8 +9,8 @@ services:
     volumes:
       - /opt/M122/nextcloud/data:/app/nextcloud/:ro
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=33
+      - PGID=33
       - TZ=Europe/Zurich
     ports:
       - 8384:8384 # Web UI
