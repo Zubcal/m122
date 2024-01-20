@@ -114,8 +114,11 @@ sudo wget -O /opt/M122/docker/.env https://raw.githubusercontent.com/Zubcal/m122
 # Download the docker-entrypoint.sh file to /opt/M122/nextcloud/docker
 sudo wget -O /opt/M122/nextcloud/docker/docker-entrypoint.sh https://github.com/Zubcal/m122/blob/main/nextcloud-server/docker-entrypoint.sh > /dev/null 2>&1
 
-# Create the "nextcloud" network
-docker network create nextcloud
+# Überprüfen, ob das Docker-Netzwerk namens "nextcloud" existiert
+if ! sudo docker network inspect nextcloud &> /dev/null; then
+    # Das Netzwerk existiert nicht, erstelle es
+    sudo docker network create nextcloud
+fi
 
 # Run docker-compose up -d in /opt/M122/docker
 sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
