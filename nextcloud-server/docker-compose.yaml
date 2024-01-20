@@ -1,7 +1,7 @@
 version: "3"
 services:
   syncthing:
-    image: lscr.io/linuxserver/syncthing:latest
+    image: syncthing/syncthing:latest
     container_name: syncthing
     hostname: syncthing-main-node
     depends_on:
