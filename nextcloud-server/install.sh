@@ -10,7 +10,7 @@ check_nextcloud_status() {
     
     # Überprüfen, ob Nextcloud installiert ist
     if [[ $status_output == *"installed: true"* ]]; then
-        echo "✔️ Nextcloud ist installiert"
+        echo "✔ Nextcloud ist installiert"
 
         # Inhalt für die config.php-Datei
         config_content=$(cat <<EOL
