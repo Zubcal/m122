@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
+server_ip=$(hostname -I | awk '{print $1}')
 check_nextcloud_status() {
     status_output=$(sudo docker exec -t --user www-data nextcloud /var/www/html/occ status)
     
@@ -44,14 +45,11 @@ EOF
         exit 0  # Das Skript beenden, da Nextcloud installiert ist
     else
         echo "Nextcloud ist noch nicht installiert"
+        # Meldung an den Benutzer ausgeben
+        echo "Bitte Öffne einen Webbrowser und gehe zur folgenden Adresse, um Nextcloud zu installieren: http://${server_ip}:1880"
     fi
 }
 
-server_ip=$(hostname -I | awk '{print $1}')
-
-# Meldung an den Benutzer ausgeben
-echo "Öffnen Sie einen Webbrowser und gehen Sie zur folgenden Adresse, um Nextcloud zu installieren:"
-echo "http://${server_ip}:1880"
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
