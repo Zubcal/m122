@@ -2,10 +2,14 @@
 
 # Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
 server_ip=$(hostname -I | awk '{print $1}')
+
+# Variable zur Überprüfung, ob die Meldung bereits angezeigt wurde
+install_message_displayed=false
+
+# Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
 check_nextcloud_status() {
     status_output=$(sudo docker exec -t --user www-data nextcloud /var/www/html/occ status)
-    
-    
+
     # Überprüfen, ob Nextcloud installiert ist
     if [[ $status_output == *"installed: true"* ]]; then
         echo " ✔ Nextcloud ist installiert"
@@ -14,15 +18,15 @@ check_nextcloud_status() {
         config_content=$(cat <<EOL
   'loglevel' => 1,
   'log_type' => 'file',
-  'logfile' => '/var/log/nextcloud.log',
+  'logfile' => '/var/www/html/data/nextcloud.log',
   'log_type_audit' => 'file',
-  'logfile_audit' => '/var/log/audit.log',
+  'logfile_audit' => '/var/www/html/data/audit.log',
   'logdateformat' => 'd. F Y H:i:s',
 EOL
 )
 
         # Pfad zur config.php-Datei
-        config_file_path="/opt/M122/nextcloud/data/config/config.php"
+        config_file_path="/opt/M122/nextcloud/config/config.php"
 
         # Überprüfen, ob der Text bereits vorhanden ist
         if ! sudo grep -q "'loglevel' => 1," "$config_file_path"; then
@@ -40,13 +44,23 @@ EOF
             echo " ✔ Die logs sind bereits eingerichtet."
         fi
 
+        # Befehle für Audit-Logging aktivieren
+        sudo docker exec -it --user www-data nextcloud /var/www/html/occ config:app:set admin_audit logfile --value=/var/www/html/data/audit.log
+        sudo docker exec -it --user www-data nextcloud /var/www/html/occ app:enable admin_audit
+
         exit 0  # Das Skript beenden, da Nextcloud installiert ist
-    else
+    fi
+
+    # Meldung an den Benutzer ausgeben, wenn Nextcloud noch nicht installiert ist
+    if [ "$install_message_displayed" = false ]; then
         echo "Nextcloud ist noch nicht installiert"
-        # Meldung an den Benutzer ausgeben
         echo "Bitte Öffne einen Webbrowser und gehe zur folgenden Adresse, um Nextcloud zu installieren: http://${server_ip}:1880 🌐"
+        install_message_displayed=true
     fi
 }
+
+
+
 
 
 # Check if Docker is installed
@@ -100,7 +114,7 @@ sudo mkdir -p /opt/M122/docker
 
 #  Create subdirectories data, logs, and docker inside /opt/M122/nextcloud
 sudo mkdir -p /opt/M122/nextcloud/data
-sudo mkdir -p /opt/M122/nextcloud/logs
+sudo mkdir -p /opt/M122/nextcloud/config
 sudo mkdir -p /opt/M122/nextcloud/docker
 
 # Download the docker-compose.yaml file to /opt/M122/docker
@@ -122,10 +136,7 @@ fi
 sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
 # Endlosschleife für die Überprüfung alle 3 Minuten
-timeout=$((SECONDS+300))
-while [ $SECONDS -lt $timeout ]; do
+while true; do
     check_nextcloud_status
-    sleep 10  # Warte 10 Sekunden zwischen den Überprüfungen
+    sleep 5  # Warte 5 Sekunden zwischen den Überprüfungen
 done
-
-echo "Timeout erreicht. Das Skript wird beendet, auch wenn die Installation noch nicht abgeschlossen ist."
