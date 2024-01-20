@@ -37,16 +37,16 @@ w
 q
 EOF
 
-            echo "Inhalt wurde in $config_file_path eingefügt."
+            echo "logs kofiguration wurde in $config_file_path eingefügt."
         else
-            echo "Der Text ist bereits vorhanden."
+            echo "Der logs sind bereits eingestelt."
         fi
 
         exit 0  # Das Skript beenden, da Nextcloud installiert ist
     else
         echo "Nextcloud ist noch nicht installiert"
         # Meldung an den Benutzer ausgeben
-        echo "Bitte Öffne einen Webbrowser und gehe zur folgenden Adresse, um Nextcloud zu installieren: http://${server_ip}:1880"
+        echo "Bitte Öffne einen Webbrowser und gehe zur folgenden Adresse, um Nextcloud zu installieren: http://${server_ip}:1880 🌐"
     fi
 }
 
@@ -72,7 +72,7 @@ if ! command -v docker &> /dev/null; then
     sudo apt update > /dev/null 2>&1
     sudo apt install -y docker-ce docker-ce-cli containerd.io
 
-    echo "Docker erfolgreich installiert. ❇️"
+    echo "Docker erfolgreich installiert. ✅"
 else
     echo "Docker ist bereits installiert. ✅"
 fi
@@ -84,7 +84,7 @@ if ! command -v docker-compose &> /dev/null; then
 
     sudo chmod +x /usr/local/bin/docker-compose
 
-    echo "Docker Compose erfolgreich installiert. ❇️"
+    echo "Docker Compose erfolgreich installiert. ✅"
 else
     echo "Docker Compose ist bereirts installiert. ✅"
 fi
@@ -106,13 +106,13 @@ sudo mkdir -p /opt/M122/nextcloud/logs
 sudo mkdir -p /opt/M122/nextcloud/docker
 
 # Download the docker-compose.yaml file to /opt/M122/docker
-sudo wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/docker-compose.yaml
+sudo wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/docker-compose.yaml > /dev/null 2>&1
 
 # Download the .env file to /opt/M122/docker
-sudo wget -O /opt/M122/docker/.env https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/.env
+sudo wget -O /opt/M122/docker/.env https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/.env > /dev/null 2>&1
 
 # Download the docker-entrypoint.sh file to /opt/M122/nextcloud/docker
-sudo wget -O /opt/M122/nextcloud/docker/docker-entrypoint.sh https://github.com/Zubcal/m122/blob/main/nextcloud-server/docker-entrypoint.sh
+sudo wget -O /opt/M122/nextcloud/docker/docker-entrypoint.sh https://github.com/Zubcal/m122/blob/main/nextcloud-server/docker-entrypoint.sh > /dev/null 2>&1
 
 # Create the "nextcloud" network
 docker network create nextcloud
