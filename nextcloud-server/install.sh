@@ -8,11 +8,11 @@ check_nextcloud_status() {
     echo "$status_output"
     
     # Überprüfen, ob Nextcloud installiert ist
-if [[ $status_output == *"installed: true"* ]]; then
-    echo "Nextcloud ist installiert"
+    if [[ $status_output == *"installed: true"* ]]; then
+        echo "Nextcloud ist installiert"
 
-    # Inhalt für die config.php-Datei
-    config_content=$(cat <<EOL
+        # Inhalt für die config.php-Datei
+        config_content=$(cat <<EOL
   'loglevel' => 1,
   'log_type' => 'file',
   'logfile' => '/var/log/nextcloud.log',
@@ -22,13 +22,13 @@ if [[ $status_output == *"installed: true"* ]]; then
 EOL
 )
 
-    # Pfad zur config.php-Datei
-    config_file_path="/opt/M122/nextcloud/data/config/config.php"
+        # Pfad zur config.php-Datei
+        config_file_path="/opt/M122/nextcloud/data/config/config.php"
 
-    # Überprüfen, ob der Text bereits vorhanden ist
-    if ! sudo grep -q "'loglevel' => 1," "$config_file_path"; then
-        # Einfügen des Inhalts in die config.php-Datei mit ed
-        sudo ed -s "$config_file_path" <<EOF
+        # Überprüfen, ob der Text bereits vorhanden ist
+        if ! sudo grep -q "'loglevel' => 1," "$config_file_path"; then
+            # Einfügen des Inhalts in die config.php-Datei mit ed
+            sudo ed -s "$config_file_path" <<EOF
 /'datadirectory' => '\/var\/www\/html\/data'/a
 $config_content
 .
@@ -36,14 +36,15 @@ w
 q
 EOF
 
-        echo "Inhalt wurde in $config_file_path eingefügt."
-    else
-        echo "Der Text ist bereits vorhanden."
-    fi
-else
-    echo "Nextcloud ist nicht installiert"
-fi
+            echo "Inhalt wurde in $config_file_path eingefügt."
+        else
+            echo "Der Text ist bereits vorhanden."
+        fi
 
+        exit 0  # Das Skript beenden, da Nextcloud installiert ist
+    else
+        echo "Nextcloud ist noch nicht installiert"
+    fi
 }
 
 # Check if Docker is installed
@@ -116,7 +117,10 @@ docker network create nextcloud
 sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
 # Endlosschleife für die Überprüfung alle 3 Minuten
-while true; do
+timeout=$((SECONDS+300))
+while [ $SECONDS -lt $timeout ]; do
     check_nextcloud_status
-    sleep 180  # Warte 3 Minuten
+    sleep 10  # Warte 10 Sekunden zwischen den Überprüfungen
 done
+
+echo "Timeout erreicht. Das Skript wird beendet, auch wenn die Installation noch nicht abgeschlossen ist."
