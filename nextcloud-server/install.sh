@@ -3,14 +3,14 @@
 # Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
 server_ip=$(hostname -I | awk '{print $1}')
 check_nextcloud_status() {
-    status_output=$(sudo docker exec -t --user www-data nextcloud /var/www/html/occ status)
+    status_output=$(sudo docker exec -t --user www-data nextcloud /var/www/html/occ status > /dev/null)
     
     echo "Nextcloud Status:"
     echo "$status_output"
     
     # Überprüfen, ob Nextcloud installiert ist
     if [[ $status_output == *"installed: true"* ]]; then
-        echo "Nextcloud ist installiert"
+        echo "✔️ Nextcloud ist installiert"
 
         # Inhalt für die config.php-Datei
         config_content=$(cat <<EOL
@@ -37,9 +37,9 @@ w
 q
 EOF
 
-            echo "logs kofiguration wurde in $config_file_path eingefügt."
+            echo "✔ logs kofiguration wurde in $config_file_path eingefügt."
         else
-            echo "Der logs sind bereits eingestelt."
+            echo "✔ Die logs sind bereits eingerichtet."
         fi
 
         exit 0  # Das Skript beenden, da Nextcloud installiert ist
