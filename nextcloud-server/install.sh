@@ -1,5 +1,39 @@
 #!/bin/bash
 
+# Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
+check_nextcloud_status() {
+    status_output=$(sudo docker exec -it --user www-data nextcloud /var/www/html/occ status)
+    
+    echo "Nextcloud Status:"
+    echo "$status_output"
+    
+    # Überprüfen, ob Nextcloud installiert ist
+    if [[ $status_output == *"installed: true"* ]]; then
+    echo "Nextcloud ist installiert"
+
+    # Inhalt für die config.php-Datei
+    config_content=$(cat <<EOL
+  'loglevel' => 1,
+  'log_type' => 'file',
+  'logfile' => '/var/log/nextcloud.log',
+  'log_type_audit' => 'file',
+  'logfile_audit' => '/var/log/audit.log',
+  'logdateformat' => 'd. F Y H:i:s',
+EOL
+)
+
+    # Pfad zur config.php-Datei
+    config_file_path="/opt/M122/nextcloud/data/config/config.php"
+
+    # Einfügen des Inhalts in die config.php-Datei
+    sudo sed -i "/'datadirectory' => '\/var\/www\/html\/data',/a $config_content" "$config_file_path"
+
+    echo "Inhalt wurde in $config_file_path eingefügt."
+else
+    echo "Nextcloud ist nicht installiert"
+fi
+}
+
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     # Update the package list
@@ -42,81 +76,35 @@ fi
 docker --version
 docker-compose --version
 
-if id "m122" &>/dev/null; then
-    echo "User 'm122' already exists."
-else
-    # Create user 'm122' and add to the sudo group
-    sudo useradd -m -G sudo m122
-    echo "m122 ALL=(ALL:ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/m122
+sudo mkdir -p /opt/M122
 
-    echo "User 'm122' created and added to the sudo group."
-fi
+# Create subdirectories syncthing, nextcloud, and docker inside /opt/M122
+sudo mkdir -p /opt/M122/syncthing
+sudo mkdir -p /opt/M122/nextcloud
+sudo mkdir -p /opt/M122/docker
 
-# Check if directory '/opt/M122' exists
-if [ -d "/opt/M122" ]; then
-    echo "Directory '/opt/M122' already exists."
-else
-    # Create directory '/opt/M122' and set ownership
-    sudo mkdir -p /opt/M122
-    sudo chown m122:m122 /opt/M122
+#  Create subdirectories data, logs, and docker inside /opt/M122/nextcloud
+sudo mkdir -p /opt/M122/nextcloud/data
+sudo mkdir -p /opt/M122/nextcloud/logs
+sudo mkdir -p /opt/M122/nextcloud/docker
 
-    echo "Directory '/opt/M122' created with 'm122' as the owner."
-fi
+# Download the docker-compose.yaml file to /opt/M122/docker
+sudo wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/docker-compose.yaml
 
-if [ -d "/opt/M122/docker" ]; then
-    echo "Directory '/opt/M122/docker' already exists."
-else
-    # Create directory '/opt/M122/docker' and set ownership
-    sudo mkdir -p /opt/M122/docker
-    sudo chown m122:m122 /opt/M122/docker
+# Download the .env file to /opt/M122/docker
+sudo wget -O /opt/M122/docker/.env https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/.env
 
-    echo "Directory '/opt/M122/docker' created with 'm122' as the owner."
-fi
+# Download the docker-entrypoint.sh file to /opt/M122/nextcloud/docker
+sudo wget -O /opt/M122/nextcloud/docker/docker-entrypoint.sh https://github.com/Zubcal/m122/blob/main/nextcloud-server/docker-entrypoint.sh
 
-# Check if directory '/opt/M122/nextcloud' exists
-if [ -d "/opt/M122/nextcloud" ]; then
-    echo "Directory '/opt/M122/nextcloud' already exists."
-else
-    # Create directory '/opt/M122/nextcloud' and set ownership
-    sudo mkdir -p /opt/M122/nextcloud
-    sudo chown www-data:www-data /opt/M122/nextcloud
+# Create the "nextcloud" network
+docker network create nextcloud
 
-    echo "Directory '/opt/M122/nextcloud' created with 'm122' as the owner."
-fi
+# Run docker-compose up -d in /opt/M122/docker
+sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
-# Check if directory '/opt/M122/db' exists
-if [ -d "/opt/M122/db" ]; then
-    echo "Directory '/opt/M122/db' already exists."
-else
-    # Create directory '/opt/M122/db' and set ownership
-    sudo mkdir -p /opt/M122/db
-    sudo chown m122:m122 /opt/M122/db
-
-    echo "Directory '/opt/M122/db' created with 'm122' as the owner."
-fi
-
-# Check if directory '/opt/M122/syncthing' exists
-if [ -d "/opt/M122/syncthing" ]; then
-    echo "Directory '/opt/M122/syncthing' already exists."
-else
-    # Create directory '/opt/M122/syncthing' and set ownership
-    sudo mkdir -p /opt/M122/syncthing
-    sudo chown m122:m122 /opt/M122/syncthing
-
-    echo "Directory '/opt/M122/syncthing' created with 'm122' as the owner."
-fi
-
-
-if [ ! -f "/opt/M122/docker/docker-compose.yaml" ]; then
-    sudo wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/docker-compose.yaml
-    echo "docker-compose.yaml downloaded to '/opt/M122/docker'."
-else
-    echo "docker-compose.yaml already exists in '/opt/M122/docker'."
-fi
-
-if [ ! -f "/opt/M122/docker/.env" ]; then
-    sudo wget -O /opt/M122/docker/.env https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/.env
-    echo ".env downloaded to '/opt/M122/docker'."
-else
-    echo ".env already exists in '/opt/M122/docker'."
-fi
+# Endlosschleife für die Überprüfung alle 3 Minuten
+while true; do
+    check_nextcloud_status
+    sleep 180  # Warte 3 Minuten
+done
