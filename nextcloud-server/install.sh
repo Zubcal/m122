@@ -72,9 +72,9 @@ if ! command -v docker &> /dev/null; then
     sudo apt update > /dev/null 2>&1
     sudo apt install -y docker-ce docker-ce-cli containerd.io
 
-    echo "Docker installed successfully."
+    echo "Docker erfolgreich installiert. ❇️"
 else
-    echo "Docker is already installed."
+    echo "Docker ist bereits installiert. ✅"
 fi
 
 # Check if Docker Compose is installed
@@ -84,9 +84,9 @@ if ! command -v docker-compose &> /dev/null; then
 
     sudo chmod +x /usr/local/bin/docker-compose
 
-    echo "Docker Compose installed successfully."
+    echo "Docker Compose erfolgreich installiert. ❇️"
 else
-    echo "Docker Compose is already installed."
+    echo "Docker Compose ist bereirts installiert. ✅"
 fi
 
 # Display Docker and Docker Compose versions
