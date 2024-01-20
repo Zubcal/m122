@@ -107,8 +107,7 @@ docker-compose --version
 
 sudo mkdir -p /opt/M122
 
-# Create subdirectories syncthing, nextcloud, and docker inside /opt/M122
-sudo mkdir -p /opt/M122/syncthing
+# Create subdirectories nextcloud and docker inside /opt/M122
 sudo mkdir -p /opt/M122/nextcloud
 sudo mkdir -p /opt/M122/docker
 
