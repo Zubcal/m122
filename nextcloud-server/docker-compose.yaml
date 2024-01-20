@@ -9,6 +9,8 @@ services:
     volumes:
       - /opt/M122/nextcloud/data:/var/syncthing/nextcloud:ro
     environment:
+      - PUID=0
+      - PGID=0
       - TZ=Europe/Zurich
     ports:
       - 8384:8384 # Web UI
