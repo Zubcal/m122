@@ -5,6 +5,8 @@ server_ip=$(hostname -I | awk '{print $1}')
 
 # Variable zur Überprüfung, ob die Meldung bereits angezeigt wurde
 install_message_displayed=false
+nextcloud_installed=false
+syncthing_installed=false
 
 # Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
 check_nextcloud_status() {
@@ -56,6 +58,20 @@ EOF
         echo "Nextcloud ist noch nicht installiert"
         echo "Bitte Öffne einen Webbrowser und gehe zur folgenden Adresse, um Nextcloud zu installieren: http://${server_ip}:1880 🌐"
         install_message_displayed=true
+    fi
+}
+
+check_syncthing_status() {
+    status_output=$(sudo docker exec -t syncthing /bin/sh -c "syncthing -version")
+
+    # Überprüfen, ob Syncthing installiert ist
+    if [[ $status_output == *"syncthing v"* ]]; then
+        syncthing_installed=true
+        echo " ✔ Syncthing ist installiert"
+
+        # Ordner für Syncthing hinzufügen
+        sudo docker exec -t syncthing /bin/sh -c "syncthing cli config folders add --id nextcloud --label nextcloud --path /var/syncthing --type sendonly --ignore-perms"
+        echo "Syncthing-Ordner 'nextcloud' wurde hinzugefügt."
     fi
 }
 
@@ -137,5 +153,13 @@ sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 # Endlosschleife für die Überprüfung alle 3 Minuten
 while true; do
     check_nextcloud_status
+    check_syncthing_status
+
+    # Wenn Nextcloud und Syncthing installiert sind, das Skript beenden
+    if [ "$nextcloud_installed" = true ] && [ "$syncthing_installed" = true ]; then
+        echo "Nextcloud und Syncthing sind installiert. Das Skript wird beendet."
+        exit 0
+    fi
+
     sleep 5  # Warte 5 Sekunden zwischen den Überprüfungen
 done
