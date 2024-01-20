@@ -45,8 +45,8 @@ EOF
         fi
 
         # Befehle für Audit-Logging aktivieren
-        sudo docker exec -it --user www-data nextcloud /var/www/html/occ config:app:set admin_audit logfile --value=/var/www/html/data/audit.log
-        sudo docker exec -it --user www-data nextcloud /var/www/html/occ app:enable admin_audit
+        sudo docker exec -t --user www-data nextcloud /var/www/html/occ config:app:set admin_audit logfile --value=/var/www/html/data/audit.log
+        sudo docker exec -t --user www-data nextcloud /var/www/html/occ app:enable admin_audit
 
         exit 0  # Das Skript beenden, da Nextcloud installiert ist
     fi
