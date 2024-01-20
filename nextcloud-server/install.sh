@@ -56,7 +56,7 @@ echo "http://${server_ip}:1880"
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     # Update the package list
-    sudo apt update
+    sudo apt update > /dev/null 2>&1
 
     # Install required dependencies
     sudo apt install -y \
@@ -71,7 +71,7 @@ if ! command -v docker &> /dev/null; then
 
     echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    sudo apt update
+    sudo apt update > /dev/null 2>&1
     sudo apt install -y docker-ce docker-ce-cli containerd.io
 
     echo "Docker installed successfully."
