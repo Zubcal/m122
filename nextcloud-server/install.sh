@@ -47,6 +47,12 @@ EOF
     fi
 }
 
+server_ip=$(hostname -I | awk '{print $1}')
+
+# Meldung an den Benutzer ausgeben
+echo "Öffnen Sie einen Webbrowser und gehen Sie zur folgenden Adresse, um Nextcloud zu installieren:"
+echo "http://${server_ip}:1880"
+
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     # Update the package list
