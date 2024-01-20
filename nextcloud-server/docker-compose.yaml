@@ -4,6 +4,10 @@ services:
     image: lscr.io/linuxserver/syncthing:latest
     container_name: syncthing
     hostname: syncthing-main-node
+    depends_on:
+      - nextcloud
+    volumes:
+      - /opt/M122/nextcloud/data:/app/nextcloud/:ro
     environment:
       - PUID=1000
       - PGID=1000
@@ -33,8 +37,8 @@ services:
     depends_on:
       - db
     volumes:
-      - /opt/M122/nextcloud/data:/var/www/html/
-      - /opt/M122/nextcloud/logs:/var/log/
+      - /opt/M122/nextcloud/data:/var/www/html/data/
+      - /opt/M122/nextcloud/config:/var/www/html/config/
       - /opt/M122/nextcloud/docker:/docker-entrypoint-hooks.d/before-starting/
     environment:
       - TZ=Europe/Zurich
