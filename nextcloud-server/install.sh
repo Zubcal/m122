@@ -8,7 +8,7 @@ check_nextcloud_status() {
     echo "$status_output"
     
     # Überprüfen, ob Nextcloud installiert ist
-    if [[ $status_output == *"installed: true"* ]]; then
+if [[ $status_output == *"installed: true"* ]]; then
     echo "Nextcloud ist installiert"
 
     # Inhalt für die config.php-Datei
@@ -25,13 +25,25 @@ EOL
     # Pfad zur config.php-Datei
     config_file_path="/opt/M122/nextcloud/data/config/config.php"
 
-    # Einfügen des Inhalts in die config.php-Datei
-    sudo sed -i "/'datadirectory' => '\/var\/www\/html\/data',/a $config_content" "$config_file_path"
+    # Überprüfen, ob der Text bereits vorhanden ist
+    if ! sudo grep -q "'loglevel' => 1," "$config_file_path"; then
+        # Einfügen des Inhalts in die config.php-Datei mit ed
+        sudo ed -s "$config_file_path" <<EOF
+/'datadirectory' => '\/var\/www\/html\/data'/a
+$config_content
+.
+w
+q
+EOF
 
-    echo "Inhalt wurde in $config_file_path eingefügt."
+        echo "Inhalt wurde in $config_file_path eingefügt."
+    else
+        echo "Der Text ist bereits vorhanden."
+    fi
 else
     echo "Nextcloud ist nicht installiert"
 fi
+
 }
 
 # Check if Docker is installed
