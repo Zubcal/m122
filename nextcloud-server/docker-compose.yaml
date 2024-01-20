@@ -7,7 +7,7 @@ services:
     depends_on:
       - nextcloud
     volumes:
-      - /opt/M122/nextcloud/data:/var/syncthing/nextcloud:ro
+      - /opt/M122/nextcloud/data:/app/nextcloud:ro
     environment:
       - PUID=0
       - PGID=0
