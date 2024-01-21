@@ -41,33 +41,31 @@ w
 q
 EOF
 
-            echo "logs kofiguration wurde in $config_file_path eingefügt. ✅"
+            echo "logs Kofiguration wurde in $config_file_path eingefügt. ✅"
         else
             echo " ✔ Die logs sind bereits eingerichtet."
         fi
 
+        # .stignore-Datei erstellen oder Text aktualisieren
         stignore_path="/var/syncthing/.stignore"
-
-# Inhalt für die .stignore-Datei
-stignore_content=$(cat <<EOL
+        stignore_content=$(cat <<EOL
 !nextcloud.log
 !nextcloud/audit.log
 */
 EOL
 )
 
-# Überprüfen, ob die .stignore-Datei bereits existiert und der Text korrekt ist
-if sudo docker exec -t syncthing [ ! -f "$stignore_path" ] || ! sudo docker exec -t syncthing grep -q "nextcloud.log" "$stignore_path"; then
-    # .stignore-Datei erstellen oder Text aktualisieren
-    sudo docker exec -t syncthing sh -c "echo '$stignore_content' > $stignore_path"
-    echo " ✔ .stignore-Datei wurde erstellt oder aktualisiert."
-else
-    echo " ✔ .stignore-Datei existiert bereits und ist korrekt konfiguriert."
-fi
+        if ! sudo docker exec -t syncthing grep -q "nextcloud.log" "$stignore_path"; then
+            sudo docker exec -t syncthing sh -c "echo '$stignore_content' > $stignore_path"
+            echo " ✔ .stignore-Datei wurde erstellt oder aktualisiert."
+        else
+            echo " ✔ .stignore-Datei existiert bereits und ist korrekt konfiguriert."
+        fi
 
         # Befehle für Audit-Logging aktivieren
-        sudo docker exec -t --user www-data nextcloud /var/www/html/occ config:app:set admin_audit logfile --value=/var/www/html/data/audit.log
-        sudo docker exec -t --user www-data nextcloud /var/www/html/occ app:enable admin_audit
+        sudo docker exec -t --user www-data nextcloud /var/www/html/occ config:app:set admin_audit logfile --value=/var/www/html/data/audit.log > /dev/null 2>&1
+        sudo docker exec -t --user www-data nextcloud /var/www/html/occ app:enable admin_audit > /dev/null 2>&1
+
 
         # Überprüfen, ob der Ordner "nextcloud" bereits existiert
         syncthing_folder_check=$(sudo docker exec -t syncthing syncthing cli config folders list | grep -o "nextcloud")
@@ -79,28 +77,38 @@ fi
         else
             echo " ✔ Syncthing-Ordner 'nextcloud' existiert bereits."
         fi
-        
+
         current_device_id=$(sudo docker exec -t syncthing syncthing --device-id)
         echo "❕ Dies ist Syncthing-Gerät-ID  bitte gib diese ID auf deinem Raspi: $current_device_id"
-        # Benutzer nach der ID des Raspi fragen
-        read -p "❕ Geben Sie die ID Ihres Raspi für Syncthing ein: " raspi_id
+
+        # Benutzer nach der ID des Raspi fragen und Überprüfung der Eingabe
+        while true; do
+            read -p "❕ Geben Sie die ID Ihres Raspi für Syncthing ein: " raspi_id
+
+            # Überprüfen, ob die ID dem gewünschten Schema entspricht
+            if [[ ! "$raspi_id" =~ ^[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+$ ]]; then
+                echo "❗️ Ungültige Eingabe. Bitte geben Sie eine ID im richtigen Format ein."
+            else
+                break
+            fi
+        done
 
         # ID in das Syncthing-Konfigurationsskript einfügen
         sudo docker exec -t syncthing syncthing cli config devices add --device-id "$raspi_id" --name raspi --addresses dynamic
         echo " ✔ Gerät 'raspi' wurde zu Syncthing hinzugefügt."
 
-        if sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices list | grep -q "$raspi_id"; then
-        echo " ✔ Gerät 'raspi' ist bereits mit dem Ordner 'nextcloud' geteilt."
-        else
-            # Gerät "raspi" zum Ordner "nextcloud" hinzufügen
+        # Überprüfen, ob Gerät 'raspi' bereits mit dem Ordner 'nextcloud' geteilt ist
+        if ! sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices list | grep -q "$raspi_id"; then
+            # Gerät 'raspi' zum Ordner 'nextcloud' hinzufügen
             sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices add --device-id "$raspi_id"
             echo " ✔ Gerät 'raspi' wurde zum Ordner 'nextcloud' hinzugefügt."
+        else
+            echo " ✔ Gerät 'raspi' ist bereits mit dem Ordner 'nextcloud' geteilt."
         fi
-        
+
         exit 0  # Das Skript beenden, da Nextcloud und Syncthing installiert sind
     fi
-    
-    
+
     # Meldung an den Benutzer ausgeben, wenn Nextcloud noch nicht installiert ist
     if [ "$install_message_displayed" = false ]; then
         echo "Nextcloud ist noch nicht installiert"
@@ -108,7 +116,6 @@ fi
         install_message_displayed=true
     fi
 }
-
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
@@ -145,7 +152,7 @@ if ! command -v docker-compose &> /dev/null; then
 
     echo "Docker Compose erfolgreich installiert. ✅"
 else
-    echo "Docker Compose ist bereirts installiert. ✅"
+    echo "Docker Compose ist bereits installiert. ✅"
 fi
 
 # Display Docker and Docker Compose versions
@@ -158,7 +165,7 @@ sudo mkdir -p /opt/M122
 sudo mkdir -p /opt/M122/nextcloud
 sudo mkdir -p /opt/M122/docker
 
-#  Create subdirectories data, logs, and docker inside /opt/M122/nextcloud
+# Create subdirectories data, logs, and docker inside /opt/M122/nextcloud
 sudo mkdir -p /opt/M122/nextcloud/data
 sudo mkdir -p /opt/M122/nextcloud/config
 sudo mkdir -p /opt/M122/nextcloud/docker
