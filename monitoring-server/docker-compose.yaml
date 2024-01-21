@@ -2,7 +2,8 @@ version: "3"
 
 services:
   syncthing:
-    image: syncthing/syncthing:arm
+    image: syncthing/syncthing:latest
+    platform: linux/arm/v7
     container_name: syncthing
     hostname: syncthing-main-node
     volumes:
