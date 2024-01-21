@@ -83,7 +83,7 @@ EOL
 
         # Benutzer nach der ID des Raspi fragen und Überprüfung der Eingabe
         while true; do
-            read -p "❕ Geben Sie die ID Ihres Raspi für Syncthing ein: " raspi_id
+            read -p "❕ Geben Sie die ID Ihres Raspi für Syncthing ein: " raspi_id </dev/tty
 
             # Überprüfen, ob die ID dem gewünschten Schema entspricht
             if [[ ! "$raspi_id" =~ ^[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+$ ]]; then
