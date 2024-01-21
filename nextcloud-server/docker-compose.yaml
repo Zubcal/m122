@@ -3,7 +3,7 @@ services:
   syncthing:
     image: syncthing/syncthing:latest
     container_name: syncthing
-    hostname: syncthing-main-node
+    hostname: syncthing-data-node
     depends_on:
       - nextcloud
     volumes:
@@ -22,6 +22,7 @@ services:
   db:
     image: postgres:alpine
     container_name: postgres
+    hostname: postgres-data-node
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -33,7 +34,7 @@ services:
   nextcloud:
     image: nextcloud:27.1.3
     container_name: nextcloud
-    hostname: nextcloud-main-node
+    hostname: nextcloud-data-node
     depends_on:
       - db
     volumes:
