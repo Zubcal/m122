@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  syncthing:
+    image: syncthing/syncthing:arm
+    container_name: syncthing
+    hostname: syncthing-main-node
+    volumes:
+      - /opt/M122/syncthing/:/var/syncthing/
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zurich
+    ports:
+      - 8384:8384 # Web UI
+      - 22000:22000/tcp # TCP file transfers
+      - 22000:22000/udp # QUIC file transfers
+      - 21027:21027/udp # Receive local discovery broadcasts
+    restart: unless-stopped
