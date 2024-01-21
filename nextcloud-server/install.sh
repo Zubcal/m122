@@ -46,13 +46,61 @@ EOF
             echo " ✔ Die logs sind bereits eingerichtet."
         fi
 
+        stignore_path="/var/syncthing/.stignore"
+
+# Inhalt für die .stignore-Datei
+stignore_content=$(cat <<EOL
+!nextcloud.log
+!nextcloud/audit.log
+*/
+EOL
+)
+
+# Überprüfen, ob die .stignore-Datei bereits existiert und der Text korrekt ist
+if sudo docker exec -t syncthing [ ! -f "$stignore_path" ] || ! sudo docker exec -t syncthing grep -q "nextcloud.log" "$stignore_path"; then
+    # .stignore-Datei erstellen oder Text aktualisieren
+    sudo docker exec -t syncthing sh -c "echo '$stignore_content' > $stignore_path"
+    echo " ✔ .stignore-Datei wurde erstellt oder aktualisiert."
+else
+    echo " ✔ .stignore-Datei existiert bereits und ist korrekt konfiguriert."
+fi
+
         # Befehle für Audit-Logging aktivieren
         sudo docker exec -t --user www-data nextcloud /var/www/html/occ config:app:set admin_audit logfile --value=/var/www/html/data/audit.log
         sudo docker exec -t --user www-data nextcloud /var/www/html/occ app:enable admin_audit
 
-        exit 0  # Das Skript beenden, da Nextcloud installiert ist
-    fi
+        # Überprüfen, ob der Ordner "nextcloud" bereits existiert
+        syncthing_folder_check=$(sudo docker exec -t syncthing syncthing cli config folders list | grep -o "nextcloud")
 
+        if [ -z "$syncthing_folder_check" ]; then
+            # Syncthing-Ordner erstellen
+            sudo docker exec -t syncthing syncthing cli config folders add --id nextcloud --label nextcloud --path /var/syncthing --type sendonly --ignore-perms
+            echo " ✔ Syncthing-Ordner 'nextcloud' wurde erstellt."
+        else
+            echo " ✔ Syncthing-Ordner 'nextcloud' existiert bereits."
+        fi
+        
+        current_device_id=$(sudo docker exec -t syncthing syncthing --device-id)
+        echo "❕ Dies ist Syncthing-Gerät-ID  bitte gib diese ID auf deinem Raspi: $current_device_id"
+        # Benutzer nach der ID des Raspi fragen
+        read -p "❕ Geben Sie die ID Ihres Raspi für Syncthing ein: " raspi_id
+
+        # ID in das Syncthing-Konfigurationsskript einfügen
+        sudo docker exec -t syncthing syncthing cli config devices add --device-id "$raspi_id" --name raspi --addresses dynamic
+        echo " ✔ Gerät 'raspi' wurde zu Syncthing hinzugefügt."
+
+        if sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices list | grep -q "$raspi_id"; then
+        echo " ✔ Gerät 'raspi' ist bereits mit dem Ordner 'nextcloud' geteilt."
+        else
+            # Gerät "raspi" zum Ordner "nextcloud" hinzufügen
+            sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices add --device-id "$raspi_id"
+            echo " ✔ Gerät 'raspi' wurde zum Ordner 'nextcloud' hinzugefügt."
+        fi
+        
+        exit 0  # Das Skript beenden, da Nextcloud und Syncthing installiert sind
+    fi
+    
+    
     # Meldung an den Benutzer ausgeben, wenn Nextcloud noch nicht installiert ist
     if [ "$install_message_displayed" = false ]; then
         echo "Nextcloud ist noch nicht installiert"
@@ -60,23 +108,6 @@ EOF
         install_message_displayed=true
     fi
 }
-
-check_syncthing_status() {
-    status_output=$(sudo docker exec -t syncthing /bin/sh -c "syncthing -version")
-
-    # Überprüfen, ob Syncthing installiert ist
-    if [[ $status_output == *"syncthing v"* ]]; then
-        syncthing_installed=true
-        echo " ✔ Syncthing ist installiert"
-
-        # Ordner für Syncthing hinzufügen
-        sudo docker exec -t syncthing /bin/sh -c "syncthing cli config folders add --id nextcloud --label nextcloud --path /var/syncthing --type sendonly --ignore-perms"
-        echo "Syncthing-Ordner 'nextcloud' wurde hinzugefügt."
-    fi
-}
-
-
-
 
 
 # Check if Docker is installed
@@ -153,7 +184,6 @@ sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 # Endlosschleife für die Überprüfung alle 3 Minuten
 while true; do
     check_nextcloud_status
-    check_syncthing_status
 
     # Wenn Nextcloud und Syncthing installiert sind, das Skript beenden
     if [ "$nextcloud_installed" = true ] && [ "$syncthing_installed" = true ]; then
