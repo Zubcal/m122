@@ -4,7 +4,7 @@ services:
   syncthing:
     image: syncthing/syncthing:latest
     container_name: syncthing
-    hostname: syncthing-main-node
+    hostname: syncthing-monitoring-node
     volumes:
       - /opt/M122/syncthing/:/var/syncthing/
     environment:
