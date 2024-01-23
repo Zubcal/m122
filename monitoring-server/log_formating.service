@@ -1,0 +1,10 @@
+[Unit]
+Description=Der Service für die Formatierung von logs + mails verschicken
+
+[Service]
+ExecStart=/bin/bash /opt/M122/scripts/log_formating.sh > /opt/M122/scripts/log_formating.log 2>&1
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
