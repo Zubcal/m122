@@ -19,6 +19,9 @@ docker_installation() {
             curl \
             gnupg-agent \
             software-properties-common
+            jq
+            ssmtp
+            mailutils
 
         # Install Docker
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -60,6 +63,12 @@ create_folders() {
 
     # Ensure that the docker folder exists
     sudo mkdir -p /opt/M122/docker
+
+    # installieren von dem log firmatieren script
+    sudo wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
+    
+    # Service file herunterladen
+    sudo wget -O /etc/systemd/system/log_formating.service https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.service > /dev/null 2>&1
 }
 
 # Funktion zum Installieren von Syncthing mit Docker Compose
@@ -127,6 +136,10 @@ install_syncthing() {
     else
         echo "Gerät 'Dashboard' ist bereits mit dem Ordner 'Monitoring' geteilt. ✅"
     fi
+
+    sudo systemctl start log_formating
+    
+    sudo systemctl enable log_formating
 }
 
 # Schritt 1: Installation von Docker und Docker Compose
