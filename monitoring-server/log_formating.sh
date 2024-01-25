@@ -4,7 +4,7 @@
 NEXTCLOUD_AUDIT_LOG="/opt/M122/syncthing/nextcloud-logs/nextcloud/audit.log"
 NEXTCLOUD_NEXTCLOUD_LOG="/opt/M122/syncthing/nextcloud-logs/nextcloud/nextcloud.log"
 FORMATTED_LOGS_PATH="/opt/M122/syncthing/"
-source /root/mail_config
+
 
 # Fehlerbehandlung für Log-Dateien hinzufügen
 if [ ! -f "$NEXTCLOUD_AUDIT_LOG" ] || [ ! -r "$NEXTCLOUD_AUDIT_LOG" ]; then
