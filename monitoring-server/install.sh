@@ -138,6 +138,31 @@ install_syncthing() {
         echo "Gerät 'Dashboard' ist bereits mit dem Ordner 'Monitoring' geteilt. ✅"
     fi
 
+}
+
+# Funktion zur Konfiguration von E-Mails mit sSMTP
+configure_email() {
+    echo "Bitte geben Sie die erforderlichen E-Mail-Konfigurationsdetails ein:"
+
+    read -p "Ihre E-Mail-Adresse (Absender): " from_email
+    read -sp "Ihr E-Mail-Passwort: " email_password
+    echo  # Neue Zeile einfügen
+    read -p "E-Mail-Adresse des Empfängers: " to_email
+    read -p "SMTP-Server-Adresse mit Port (z.B. smtp.server.com:587): " smtp_server
+
+    # Konfigurationsdatei für sSMTP schreiben
+    echo "# Mailkonfiguration für sSMTP" | sudo tee /etc/ssmtp/ssmtp.conf > /dev/null
+    echo "root=$from_email" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+    echo "mailhub=$smtp_server" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+    echo "AuthUser=$from_email" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+    echo "AuthPass=$email_password" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+
+    # E-Mail-Adressen in das andere Skript einfügen
+    sed -i "s/^FROM_EMAIL=.*/FROM_EMAIL=\"$from_email\"/" /opt/M122/scripts/log_formating.sh
+    sed -i "s/^TO_EMAIL=.*/TO_EMAIL=\"$to_email\"/" /opt/M122/scripts/log_formating.sh
+
+    echo "E-Mail-Konfiguration erfolgreich gespeichert."
+
     sudo systemctl start log_formating
     
     sudo systemctl enable log_formating
