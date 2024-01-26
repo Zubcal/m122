@@ -4,7 +4,7 @@
 NEXTCLOUD_AUDIT_LOG="/opt/M122/syncthing/nextcloud-logs/nextcloud/audit.log"
 NEXTCLOUD_NEXTCLOUD_LOG="/opt/M122/syncthing/nextcloud-logs/nextcloud/nextcloud.log"
 FORMATTED_LOGS_PATH="/opt/M122/syncthing/"
-
+source /root/mail_config
 
 # Fehlerbehandlung für Log-Dateien hinzufügen
 if [ ! -f "$NEXTCLOUD_AUDIT_LOG" ] || [ ! -r "$NEXTCLOUD_AUDIT_LOG" ]; then
@@ -22,9 +22,24 @@ if [ -e "$FORMATTED_AUDIT_LOG" ] || [ -e "$FORMATTED_NEXTCLOUD_LOG" ]; then
     exit 1
 fi
 
+# E-Mail-Konfiguration
+TO_EMAIL="zubeyrcali202@gmail.com"
+FROM_EMAIL="binthenvansinthen@smart-mail.de"
+SUBJECT="Log-Einträge mit Warning-Level oder höher"
+
+# Funktion zum Versenden von E-Mails
 # Funktion zum Versenden von E-Mails
 send_email() {
-    echo "Achtung: Das Wort 'warning' wurde in den formatierten Log-Dateien gefunden." | mail -s "Betreff der E-Mail" -a "From: binthenvansinthen@smart-mail.de" "zubeyrcali202@gmail.com"
+    local log_entry="$1"
+
+    echo -e "Achtung: Das Log-Level 'warning/error/critical' wurde in den formatierten Log-Dateien gefunden. Hier ist der relevante Log-Eintrag:\n" > email_body.txt
+    echo -e "$log_entry" >> email_body.txt
+
+    # E-Mail senden
+    mail -s "$SUBJECT" -a "From: $FROM_EMAIL" "$TO_EMAIL" < email_body.txt
+
+    # Temporäre Datei löschen
+    rm email_body.txt
 }
 
 # Funktion zur Formatierung der Log-Levels
@@ -41,9 +56,18 @@ format_log_levels() {
             gsub("\"level\":[[:space:]]*" i ",", "\"level\": " levels[i] ",", $0);
         print
     }' "$1" | jq '.' > "${FORMATTED_LOGS_PATH}/formatted_$(basename "$1")"
-    # Prüfen, ob das Wort "warning" in der formatierten Datei gefunden wird
-    if grep -q "warning" "${FORMATTED_LOGS_PATH}/formatted_$(basename "$1")"; then
-        send_email
+}
+
+# Funktion zur Verarbeitung von Log-Einträgen
+process_logs() {
+    local log_file="$1"
+    local matching_entries=$(jq -c '. | select(.level == "warning" or .level == "error" or .level == "critical")' "$log_file")
+
+    # Nur die neuesten Einträge nehmen
+    latest_entry=$(echo "$matching_entries" | tail -n 1)
+
+    if [ -n "$latest_entry" ]; then
+        send_email "$latest_entry"
     fi
 }
 
@@ -53,9 +77,10 @@ watch_logs() {
         inotifywait -e modify "$NEXTCLOUD_AUDIT_LOG" "$NEXTCLOUD_NEXTCLOUD_LOG"
         format_log_levels "$NEXTCLOUD_AUDIT_LOG"
         format_log_levels "$NEXTCLOUD_NEXTCLOUD_LOG"
+        process_logs "${FORMATTED_LOGS_PATH}/formatted_$(basename "$NEXTCLOUD_AUDIT_LOG")"
+        process_logs "${FORMATTED_LOGS_PATH}/formatted_$(basename "$NEXTCLOUD_NEXTCLOUD_LOG")"
     done
 }
-
 
 # Log-Levels für beide Log-Dateien formatieren
 format_log_levels "$NEXTCLOUD_AUDIT_LOG"
