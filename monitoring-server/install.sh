@@ -25,16 +25,16 @@ docker_installation() {
             inotify-tools
 
         # Install Docker
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-        echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
         sudo apt update > /dev/null 2>&1
         sudo apt install -y docker-ce docker-ce-cli containerd.io
 
-        echo "Docker erfolgreich installiert. ✅"
+        sudo echo "Docker erfolgreich installiert. ✅"
     else
-        echo "Docker ist bereits installiert. ✅"
+        sudo echo "Docker ist bereits installiert. ✅"
     fi
 
     # Check if Docker Compose is installed
@@ -50,8 +50,8 @@ docker_installation() {
     fi
 
     # Display Docker and Docker Compose versions
-    docker --version
-    docker-compose --version
+    sudo docker --version
+    sudo docker-compose --version
 }
 
 # Funktion zum Erstellen von Ordnern für Syncthing und Scripts
@@ -68,7 +68,7 @@ create_folders() {
     # installieren von dem log firmatieren script
     sudo wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
 
-    chmod +x /opt/M122/scripts/log_formating.sh
+    sudo chmod +x /opt/M122/scripts/log_formating.sh
     
     # Service file herunterladen
     sudo wget -O /etc/systemd/system/log_formating.service https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.service > /dev/null 2>&1
@@ -82,8 +82,8 @@ install_syncthing() {
     # Run docker-compose up -d in /opt/M122/docker
     sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
-    echo "Syncthing wird installiert. Bitte warten..."
-    sleep 30  # Warte 30 Sekunden
+    sudo echo "Syncthing wird installiert. Bitte warten..."
+    sudo sleep 30  # Warte 30 Sekunden
 
 
     syncthing_folder_check=$(sudo docker exec -t syncthing syncthing cli config folders list | grep -o "monitoring")
@@ -91,14 +91,14 @@ install_syncthing() {
     if [ -z "$syncthing_folder_check" ]; then
         # Syncthing-Ordner erstellen
         sudo docker exec -t syncthing syncthing cli config folders add --id monitoring --label monitoring --path /var/syncthing --type sendonly --ignore-perms
-        echo "Syncthing-Ordner 'monotoring' wurde erstellt. ✅"
+        sudo echo "Syncthing-Ordner 'monotoring' wurde erstellt. ✅"
     else
-        echo "Syncthing-Ordner 'monitoring' existiert bereits. ✅"
+        sudo echo "Syncthing-Ordner 'monitoring' existiert bereits. ✅"
     fi
 
     # Zeige die Syncthing-Gerät-ID
     current_device_id=$(sudo docker exec -t syncthing syncthing --device-id)
-    echo "❕ Dies ist Syncthing-Gerät-ID  bitte füge diese ID den nextcloud und grafana ein: $current_device_id"
+    sudo echo "❕ Dies ist Syncthing-Gerät-ID  bitte füge diese ID den nextcloud und grafana ein: $current_device_id"
 
 
     # Benutzer nach der ID des Syncthing von Nextcloud fragen und Überprüfung der Eingabe
@@ -107,7 +107,7 @@ install_syncthing() {
 
         # Überprüfen, ob die ID dem gewünschten Schema entspricht
         if [[ ! "$nexcloud_id" =~ ^[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+-[A-Z0-9-]+$ ]]; then
-            echo "Ungültige Eingabe. Bitte geben Sie eine ID im richtigen Format ein❗️"
+            sudo echo "Ungültige Eingabe. Bitte geben Sie eine ID im richtigen Format ein❗️"
         else
             break
         fi
