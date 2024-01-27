@@ -1,5 +1,5 @@
 [Unit]
-Description=Der Service für die Formatierung von logs + mails verschicken
+Description=Der Service für die Formatierung von logs das verschicken mails der im Hintergrund läuft
 
 [Service]
 ExecStart=/bin/bash /opt/M122/scripts/log_formating.sh > /opt/M122/scripts/log_formating.log 2>&1
