@@ -18,10 +18,10 @@ docker_installation() {
             ca-certificates \
             curl \
             gnupg-agent \
-            software-properties-common
-            jq
-            ssmtp
-            mailutils
+            software-properties-common \
+            jq \
+            ssmtp \
+            mailutils \
             inotify-tools
 
         # Install Docker
