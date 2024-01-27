@@ -67,6 +67,8 @@ create_folders() {
 
     # installieren von dem log firmatieren script
     sudo wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
+
+    chmod +x /opt/M122/scripts/log_formating.sh
     
     # Service file herunterladen
     sudo wget -O /etc/systemd/system/log_formating.service https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.service > /dev/null 2>&1
@@ -151,11 +153,12 @@ configure_email() {
     read -p "SMTP-Server-Adresse mit Port (z.B. smtp.server.com:587): " smtp_server
 
     # Konfigurationsdatei für sSMTP schreiben
-    echo "# Mailkonfiguration für sSMTP" | sudo tee /etc/ssmtp/ssmtp.conf > /dev/null
-    echo "root=$from_email" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
-    echo "mailhub=$smtp_server" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
-    echo "AuthUser=$from_email" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
-    echo "AuthPass=$email_password" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+    # Eintrag für den SMTP-Server hinzufügen oder aktualisieren
+    sed -i "/^mailhub=/s/.*/mailhub=$smtp_server/" /etc/ssmtp/ssmtp.conf
+
+    # Authentifizierungsdaten aktualisieren oder hinzufügen
+    sed -i "/^AuthUser=/s/.*/AuthUser=$from_email/" /etc/ssmtp/ssmtp.conf
+    sed -i "/^AuthPass=/s/.*/AuthPass=$email_password/" /etc/ssmtp/ssmtp.conf
 
     # E-Mail-Adressen in das andere Skript einfügen
     sed -i "s/^FROM_EMAIL=.*/FROM_EMAIL=\"$from_email\"/" /opt/M122/scripts/log_formating.sh
@@ -176,3 +179,5 @@ create_folders
 
 # Schritt 3: Installieren von Syncthing mit Docker Compose
 install_syncthing
+
+configure_email
