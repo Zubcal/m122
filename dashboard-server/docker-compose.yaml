@@ -1,0 +1,79 @@
+version: "3"
+services:
+    syncthing:
+        image: syncthing/syncthing:latest
+        container_name: syncthing
+        hostname: syncthing-monitoring-node
+        volumes:
+          - /opt/M122/syncthing/:/var/syncthing/
+        environment:
+          - PUID=0
+          - PGID=1000
+          - TZ=Europe/Zurich
+        ports:
+          - 8384:8384 # Web UI
+          - 22000:22000/tcp # TCP file transfers
+          - 22000:22000/udp # QUIC file transfers
+          - 21027:21027/udp # Receive local discovery broadcasts
+        restart: unless-stopped
+
+    promtail:
+        container_name: promtail
+        hostname: promtail
+        image: grafana/promtail:latest
+        restart: unless-stopped
+        command: -config.file=/etc/promtail/docker-config.yaml
+        volumes:
+            - /opt/M122/loki:/etc/promtail
+            - /opt/M122/sycthing/formatted_nextcloud.log:/var/log/nextcloud.log
+            - /opt/M122/sycthing/formatted_audit.log:/var/log/audit.log
+        networks:
+            - grafana
+
+    loki:
+        container_name: loki
+        hostname: loki
+        image: grafana/loki:latest
+        restart: unless-stopped
+        ports:
+            - "3100:3100"
+        networks:
+            - grafana
+
+    grafana:
+        image: grafana/grafana:latest
+        hostname: grafana
+        entrypoint:
+          - sh
+          - -euc
+          - |
+            mkdir -p /etc/grafana/provisioning/datasources
+            cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+            apiVersion: 1
+            datasources:
+            - name: Loki
+              type: loki
+              access: proxy
+              orgId: 1
+              url: http://loki:3100
+              basicAuth: false
+              isDefault: true
+              version: 1
+              editable: false
+            EOF
+            /run.sh
+        depends_on:
+            - promtail
+            - loki
+        environment:
+          - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+          - GF_AUTH_ANONYMOUS_ENABLED=true
+          - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+        ports:
+          - "3000:3000"
+        networks:
+          - grafana
+
+    networks:
+        grafana:
+            external: true
