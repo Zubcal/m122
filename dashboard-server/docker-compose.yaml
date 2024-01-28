@@ -16,8 +16,7 @@ services:
           - 22000:22000/udp # QUIC file transfers
           - 21027:21027/udp # Receive local discovery broadcasts
         restart: unless-stopped
-        networks:
-            - grafana
+
 
     promtail:
         container_name: promtail
@@ -31,8 +30,6 @@ services:
             - /opt/M122/loki:/etc/promtail
             - /opt/M122/sycthing/monitoring/formatted_nextcloud.log:/var/log/formatted_nextcloud.log
             - /opt/M122/sycthing/monitoring/formatted_audit.log:/var/log/formatted_audit.log
-        networks:
-            - grafana
 
     loki:
         container_name: loki
@@ -45,8 +42,6 @@ services:
             - "3100"
         ports:
             - "3100:3100"
-        networks:
-            - grafana
 
     grafana:
         image: grafana/grafana:latest
@@ -81,9 +76,3 @@ services:
           - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
         ports:
           - "3000:3000"
-        networks:
-          - grafana
-
-    networks:
-        grafana:
-            external: true
