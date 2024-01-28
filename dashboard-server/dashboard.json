@@ -2285,7 +2285,7 @@
       "type": "table"
     }
   ],
-  "refresh": "auto",
+  "refresh": "30s",
   "schemaVersion": 39,
   "tags": [
     "nextcloud",
@@ -2295,7 +2295,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "Loki",
           "value": "P8E80F9AEF21F6940"
         },
@@ -2445,6 +2445,6 @@
   "timezone": "",
   "title": "Nextcloud Logs",
   "uid": "ILsBP9t4R",
-  "version": 9,
+  "version": 2,
   "weekStart": ""
 }
