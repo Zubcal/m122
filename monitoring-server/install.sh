@@ -163,7 +163,7 @@ configure_email() {
         echo "AuthPass=$email_password" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
     fi
 
-    sudo sed -i '/^#FromLineOverride=YES/s/^# //' /etc/ssmtp/ssmtp.conf
+    sudo sed -i 's/^#FromLineOverride=YES/FromLineOverride=YES/' /etc/ssmtp/ssmtp.conf
 
     # E-Mail-Adressen in das andere Skript einfügen
     sed -i "s/^FROM_EMAIL=.*/FROM_EMAIL=\"$from_email\"/" /opt/M122/scripts/log_formating.sh
