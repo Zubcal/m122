@@ -50,8 +50,6 @@ services:
         image: grafana/grafana:latest
         container_name: grafana
         hostname: grafana
-        volumes:
-            - /opt/M122/grafana:/var/lib/grafana:rw
         entrypoint:
           - sh
           - -euc
