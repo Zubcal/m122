@@ -84,8 +84,21 @@ create_folders() {
 install_syncthing() {
 
 
-    # Run docker-compose up -d in /opt/M122/docker
-    sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
+ docker run -d \
+  --name syncthing \
+  --hostname syncthing \
+  -v /opt/M122/syncthing/:/var/syncthing/ \
+  -e PUID=0 \
+  -e PGID=1000 \
+  -e TZ=Europe/Zurich \
+  -p 8384:8384 \
+  -p 22000:22000/tcp \
+  -p 22000:22000/udp \
+  -p 21027:21027/udp \
+  --restart unless-stopped \
+  syncthing/syncthing:latest
+  
+
 
     echo "Syncthing wird installiert. Bitte warten..."
     sleep 30  # Warte 30 Sekunden
@@ -110,6 +123,12 @@ install_syncthing() {
 
     sudo docker exec -t syncthing syncthing cli config devices add --device-id "$monitoring_id" --name monitoring --addresses dynamic --auto-accept-folders
     echo "Gerät 'Monitoring' wurde zu Syncthing hinzugefügt. ✅ "
+
+    echo "Bitte warten ..."
+    sleep 10  # Warte 2 minuten
+
+        # Run docker-compose up -d in /opt/M122/docker
+    sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
     echo "Grafana, loki & Promtail werden insralliert ..."
     sleep 150  # Warte 2 minuten
