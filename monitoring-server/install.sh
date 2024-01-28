@@ -69,7 +69,7 @@ create_folders() {
     wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
 
     sudo chmod +x /opt/M122/scripts/log_formating.sh
-    
+
     # Service file herunterladen
     wget -O /etc/systemd/system/log_formating.service https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.service > /dev/null 2>&1
 }
@@ -86,15 +86,8 @@ install_syncthing() {
     sleep 30  # Warte 30 Sekunden
 
 
-    syncthing_folder_check=$(sudo docker exec -t syncthing syncthing cli config folders list | grep -o "monitoring")
+    syncthing_folder_check=$(sudo docker exec -t syncthing syncthing cli config folders list | grep -o "nextcloud")
 
-    if [ -z "$syncthing_folder_check" ]; then
-        # Syncthing-Ordner erstellen
-        sudo docker exec -t syncthing syncthing cli config folders add --id monitoring --label monitoring --path /var/syncthing --type sendonly --ignore-perms
-        echo "Syncthing-Ordner 'monotoring' wurde erstellt. ✅"
-    else
-        echo "Syncthing-Ordner 'monitoring' existiert bereits. ✅"
-    fi
 
     # Zeige die Syncthing-Gerät-ID
     current_device_id=$(sudo docker exec -t syncthing syncthing --device-id)
@@ -113,6 +106,12 @@ install_syncthing() {
         fi
     done
 
+
+    sudo docker exec -t syncthing syncthing cli config devices add --device-id "$nexcloud_id" --name nextcloud --addresses dynamic --auto-accept-folders
+    sleep 30
+    echo "Gerät 'nextcloud' wurde zu Syncthing hinzugefügt. ✅ "
+
+
     # Benutzer nach der ID des Syncthing vom Dashboard Server fragen und Überprüfung der Eingabe
     while true; do
         read -p "Geben Sie die ID Ihres Dashboard für Syncthing ein❕ : " dashboard_id </dev/tty
@@ -125,8 +124,7 @@ install_syncthing() {
         fi
     done
 
-    sudo docker exec -t syncthing syncthing cli config devices add --device-id "$nexcloud_id" --name nextcloud --addresses dynamic --auto-accept-folders
-    echo "Gerät 'nextcloud' wurde zu Syncthing hinzugefügt. ✅ "
+
 
     sudo docker exec -t syncthing syncthing cli config devices add --device-id "$dashboard_id" --name Dashboard --addresses dynamic
     echo "Gerät 'Dashboard' wurde zu Syncthing hinzugefügt. ✅"
@@ -135,9 +133,9 @@ install_syncthing() {
     if ! sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices list | grep -q "$dashboard_id"; then
         # Gerät 'Dashboard' zum Ordner 'Monitoring' hinzufügen
         sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices add --device-id "$dashboard_id"
-        echo "Gerät 'Dashboard' wurde zum Ordner 'Monitoring' hinzugefügt. ✅"
+        echo "Gerät 'Dashboard' wurde zum Ordner 'Nextcloud' hinzugefügt. ✅"
     else
-        echo "Gerät 'Dashboard' ist bereits mit dem Ordner 'Monitoring' geteilt. ✅"
+        echo "Gerät 'Dashboard' ist bereits mit dem Ordner 'Nextcloud' geteilt. ✅"
     fi
 
 }
@@ -156,9 +154,16 @@ configure_email() {
     # Eintrag für den SMTP-Server hinzufügen oder aktualisieren
     sed -i "/^mailhub=/s/.*/mailhub=$smtp_server/" /etc/ssmtp/ssmtp.conf
 
-    # Authentifizierungsdaten aktualisieren oder hinzufügen
-    sed -i "/^AuthUser=/s/.*/AuthUser=$from_email/" /etc/ssmtp/ssmtp.conf
-    sed -i "/^AuthPass=/s/.*/AuthPass=$email_password/" /etc/ssmtp/ssmtp.conf
+    # Überprüfen, ob AuthUser und AuthPass bereits in der Datei vorhanden sind
+    if ! grep -q "^AuthUser=" /etc/ssmtp/ssmtp.conf; then
+        echo "AuthUser=$from_email" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+    fi
+
+    if ! grep -q "^AuthPass=" /etc/ssmtp/ssmtp.conf; then
+        echo "AuthPass=$email_password" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
+    fi
+
+    sudo sed -i '/^#FromLineOverride=YES/s/^# //' /etc/ssmtp/ssmtp.conf
 
     # E-Mail-Adressen in das andere Skript einfügen
     sed -i "s/^FROM_EMAIL=.*/FROM_EMAIL=\"$from_email\"/" /opt/M122/scripts/log_formating.sh
@@ -167,7 +172,7 @@ configure_email() {
     echo "E-Mail-Konfiguration erfolgreich gespeichert."
 
     systemctl start log_formating
-    
+
     systemctl enable log_formating
 }
 
