@@ -8,8 +8,8 @@ services:
         command: -config.file=/etc/promtail/promtail-config.yaml
         volumes:
             - /opt/M122/promtail:/etc/promtail
-            - /opt/M122/syncthing/nextcloud/nextcloud/nextcloud.log:/var/log/nextcloud.log:ro
-            - /opt/M122/syncthing/nextcloud/nextcloud/audit.log:/var/log/audit.log:ro
+            - /opt/M122/syncthing/nextcloud-logs/nextcloud/nextcloud.log:/var/log/nextcloud.log:ro
+            - /opt/M122/syncthing/nextcloud-logs/nextcloud/audit.log:/var/log/audit.log:ro
 
     loki:
         container_name: loki
