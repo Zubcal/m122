@@ -27,9 +27,9 @@ services:
         restart: unless-stopped
         command: -config.file=/etc/promtail/docker-config.yaml
         volumes:
-            - /opt/M122/loki:/etc/promtail
-            - /opt/M122/sycthing/monitoring/formatted_nextcloud.log:/var/log/formatted_nextcloud.log
-            - /opt/M122/sycthing/monitoring/formatted_audit.log:/var/log/formatted_audit.log
+            - /opt/M122/promtail:/etc/promtail
+            - /opt/M122/syncthing/monitoring/formatted_nextcloud.log:/var/log/formatted_nextcloud.log
+            - /opt/M122/syncthing/monitoring/formatted_audit.log:/var/log/formatted_audit.log
 
     loki:
         container_name: loki
@@ -38,6 +38,8 @@ services:
             - syncthing
         image: grafana/loki:latest
         restart: unless-stopped
+        volumes:
+            - /opt/M122/promtail:/etc/loki
         expose:
             - "3100"
         ports:
