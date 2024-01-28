@@ -25,7 +25,7 @@ services:
             - syncthing
         image: grafana/promtail:latest
         restart: unless-stopped
-        command: -config.file=/etc/promtail/docker-config.yaml
+        command: -config.file=/etc/promtail/promtail-config.yaml
         volumes:
             - /opt/M122/promtail:/etc/promtail
             - /opt/M122/syncthing/monitoring/formatted_nextcloud.log:/var/log/formatted_nextcloud.log
@@ -38,6 +38,7 @@ services:
             - syncthing
         image: grafana/loki:latest
         restart: unless-stopped
+        command: -config.file=/etc/loki/loki-config.yaml
         volumes:
             - /opt/M122/promtail:/etc/loki
         expose:
