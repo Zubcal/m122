@@ -17,4 +17,4 @@ scrape_configs:
           instance: cloud.homenas.tk
           env: home-lab
           job: nextcloud
-          __path__: /var/log/formated_{nextcloud,audit}.log
+          __path__: /var/log/formatted_{nextcloud,audit}.log
