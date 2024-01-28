@@ -76,9 +76,21 @@ create_folders() {
 
     # installieren von dem log firmatieren script
     wget -O /opt/M122/promtail/promtail-config.yaml https://raw.githubusercontent.com/Zubcal/m122/main/dashboard-server/promtail-config.yaml > /dev/null 2>&1
-    
+
     # installieren von dem log firmatieren script
     wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/dashboard-server/docker-compose.yaml > /dev/null 2>&1
+}
+
+check_logs_existence() {
+    while true; do
+        if [[ -f "/opt/M122/syncthing/nextcloud-logs/nextcloud/audit.log" && -f "/opt/M122/syncthing/nextcloud-logs/nextcloud/nextcloud.log" ]]; then
+            echo "Audit- und Nextcloud-Logs wurden gefunden. Docker-Compose wird gestartet."
+            break
+        else
+            echo "Audit- und/oder Nextcloud-Logs werden noch nicht gefunden. Warte 5 Sekunden..."
+            sleep 5
+        fi
+    done
 }
 
 install_syncthing() {
@@ -97,7 +109,7 @@ install_syncthing() {
   -p 21027:21027/udp \
   --restart unless-stopped \
   syncthing/syncthing:latest
-  
+
 
 
     echo "Syncthing wird installiert. Bitte warten..."
@@ -127,7 +139,9 @@ install_syncthing() {
     echo "Bitte warten ..."
     sleep 10  # Warte 2 minuten
 
-        # Run docker-compose up -d in /opt/M122/docker
+    check_logs_existence
+
+    # Run docker-compose up -d in /opt/M122/docker
     sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
     echo "Grafana, loki & Promtail werden insralliert ..."
