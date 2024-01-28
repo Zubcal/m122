@@ -40,7 +40,7 @@ services:
         restart: unless-stopped
         command: -config.file=/etc/loki/loki-config.yaml
         volumes:
-            - /opt/M122/promtail:/etc/loki
+            - /opt/M122/loki:/etc/loki
         expose:
             - "3100"
         ports:
