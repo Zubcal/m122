@@ -21,8 +21,6 @@ services:
     promtail:
         container_name: promtail
         hostname: promtail
-        depends_on:
-            - syncthing
         image: grafana/promtail:latest
         restart: unless-stopped
         command: -config.file=/etc/promtail/promtail-config.yaml
@@ -34,8 +32,6 @@ services:
     loki:
         container_name: loki
         hostname: loki
-        depends_on:
-            - syncthing
         image: grafana/loki:latest
         restart: unless-stopped
         command: -config.file=/etc/loki/loki-config.yaml
@@ -70,7 +66,6 @@ services:
             EOF
             /run.sh
         depends_on:
-            - syncthing
             - promtail
             - loki
         environment:
