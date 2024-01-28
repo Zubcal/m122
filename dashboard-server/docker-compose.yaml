@@ -29,8 +29,8 @@ services:
         command: -config.file=/etc/promtail/docker-config.yaml
         volumes:
             - /opt/M122/loki:/etc/promtail
-            - /opt/M122/sycthing/monitoring/formatted_nextcloud.log:/var/log/nextcloud.log
-            - /opt/M122/sycthing/monitoring/formatted_audit.log:/var/log/audit.log
+            - /opt/M122/sycthing/monitoring/formatted_nextcloud.log:/var/log/formatted_nextcloud.log
+            - /opt/M122/sycthing/monitoring/formatted_audit.log:/var/log/formatted_audit.log
         networks:
             - grafana
 
