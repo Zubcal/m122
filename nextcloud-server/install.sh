@@ -72,7 +72,7 @@ EOL
 
         if [ -z "$syncthing_folder_check" ]; then
             # Syncthing-Ordner erstellen
-            sudo docker exec -t syncthing syncthing cli config folders add --id nextcloud --label nextcloud-logs --path /var/syncthing --type sendonly --ignore-perms
+            sudo docker exec -t syncthing syncthing cli config folders add --id nextcloud --label nextcloud-logs --path /var/syncthing --ignore-perms
             echo " ✔ Syncthing-Ordner 'nextcloud' wurde erstellt."
         else
             echo " ✔ Syncthing-Ordner 'nextcloud' existiert bereits."
