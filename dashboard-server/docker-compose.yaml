@@ -16,6 +16,8 @@ services:
           - 22000:22000/udp # QUIC file transfers
           - 21027:21027/udp # Receive local discovery broadcasts
         restart: unless-stopped
+        networks:
+            - grafana
 
     promtail:
         container_name: promtail
@@ -27,8 +29,8 @@ services:
         command: -config.file=/etc/promtail/docker-config.yaml
         volumes:
             - /opt/M122/loki:/etc/promtail
-            - /opt/M122/sycthing/formatted_nextcloud.log:/var/log/nextcloud.log
-            - /opt/M122/sycthing/formatted_audit.log:/var/log/audit.log
+            - /opt/M122/sycthing/monitoring/formatted_nextcloud.log:/var/log/nextcloud.log
+            - /opt/M122/sycthing/monitoring/formatted_audit.log:/var/log/audit.log
         networks:
             - grafana
 
@@ -70,6 +72,7 @@ services:
             EOF
             /run.sh
         depends_on:
+            - syncthing
             - promtail
             - loki
         environment:
