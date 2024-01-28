@@ -1,5 +1,6 @@
 #!/bin/bash
 
+server_ip=$(hostname -I | awk '{print $1}')
 # Funktion zum Überprüfen, ob ein Befehl vorhanden ist
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -82,11 +83,6 @@ create_folders() {
 
 install_syncthing() {
 
-        # Überprüfen, ob das Docker-Netzwerk namens "nextcloud" existiert
-    if ! sudo docker network inspect nextcloud &> /dev/null; then
-        # Das Netzwerk existiert nicht, erstelle es
-        sudo docker network create nextcloud
-    fi
 
     # Run docker-compose up -d in /opt/M122/docker
     sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
@@ -96,7 +92,7 @@ install_syncthing() {
 
     # Zeige die Syncthing-Gerät-ID
     current_device_id=$(sudo docker exec -t syncthing syncthing --device-id)
-    echo "❕ Dies ist Syncthing-Gerät-ID  bitte füge diese ID in ihrem Monitoring Sycthing ein: $current_device_id"
+    echo "❕ Dies ist Syncthing-Gerät-ID  bitte füge diese ID in ihrem Monitoring Syncthing ein: $current_device_id"
 
 
     # Benutzer nach der ID des Syncthing vom Monotoring fragen und Überprüfung der Eingabe
@@ -115,14 +111,10 @@ install_syncthing() {
     sudo docker exec -t syncthing syncthing cli config devices add --device-id "$monitoring_id" --name monitoring --addresses dynamic --auto-accept-folders
     echo "Gerät 'Monitoring' wurde zu Syncthing hinzugefügt. ✅ "
 
-        # Überprüfen, ob Gerät 'Dashboard' bereits mit dem Ordner 'Monitoring' geteilt ist
-    if ! sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices list | grep -q "$dashboard_id"; then
-        # Gerät 'Dashboard' zum Ordner 'Monitoring' hinzufügen
-        sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices add --device-id "$dashboard_id"
-        echo "Gerät 'Dashboard' wurde zum Ordner 'Monitoring' hinzugefügt. ✅"
-    else
-        echo "Gerät 'Dashboard' ist bereits mit dem Ordner 'Monitoring' geteilt. ✅"
-    fi
+    echo "Grafana, loki & Promtail werden insralliert ..."
+    sleep 150  # Warte 2 minuten
+
+    echo "Grafana-Dashboard ist nun erreichbar unter: http://${server_ip}:3000 🌐"
 
 }
 
