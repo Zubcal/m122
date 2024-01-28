@@ -98,9 +98,9 @@ EOL
         echo " ✔ Gerät 'raspi' wurde zu Syncthing hinzugefügt."
 
         # Überprüfen, ob Gerät 'raspi' bereits mit dem Ordner 'nextcloud' geteilt ist
-        if ! sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices list | grep -q "$raspi_id"; then
+        if ! sudo docker exec -t syncthing syncthing cli config folders "nextcloud" devices list | grep -q "$raspi_id"; then
             # Gerät 'raspi' zum Ordner 'nextcloud' hinzufügen
-            sudo docker exec -t syncthing syncthing cli config folders "$syncthing_folder_check" devices add --device-id "$raspi_id"
+            sudo docker exec -t syncthing syncthing cli config folders "nextcloud" devices add --device-id "$raspi_id"
             echo " ✔ Gerät 'raspi' wurde zum Ordner 'nextcloud' hinzugefügt."
         else
             echo " ✔ Gerät 'raspi' ist bereits mit dem Ordner 'nextcloud' geteilt."
