@@ -3,7 +3,7 @@ services:
     syncthing:
         image: syncthing/syncthing:latest
         container_name: syncthing
-        hostname: syncthing-monitoring-node
+        hostname: syncthing
         volumes:
           - /opt/M122/syncthing/:/var/syncthing/
         environment:
@@ -20,6 +20,8 @@ services:
     promtail:
         container_name: promtail
         hostname: promtail
+        depends_on:
+            - syncthing
         image: grafana/promtail:latest
         restart: unless-stopped
         command: -config.file=/etc/promtail/docker-config.yaml
@@ -33,6 +35,8 @@ services:
     loki:
         container_name: loki
         hostname: loki
+        depends_on:
+            - syncthing
         image: grafana/loki:latest
         restart: unless-stopped
         ports:
