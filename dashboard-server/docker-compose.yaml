@@ -39,6 +39,8 @@ services:
             - syncthing
         image: grafana/loki:latest
         restart: unless-stopped
+        expose:
+            - "3100"
         ports:
             - "3100:3100"
         networks:
