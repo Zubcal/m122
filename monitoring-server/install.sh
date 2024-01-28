@@ -57,33 +57,33 @@ docker_installation() {
 # Funktion zum Erstellen von Ordnern für Syncthing und Scripts
 create_folders() {
     # Create folder for Syncthing
-    sudo mkdir -p /opt/M122/syncthing
+    mkdir -p /opt/M122/syncthing
 
     # Create folder for scripts
-    sudo mkdir -p /opt/M122/scripts
+    mkdir -p /opt/M122/scripts
 
     # Ensure that the docker folder exists
-    sudo mkdir -p /opt/M122/docker
+    mkdir -p /opt/M122/docker
 
     # installieren von dem log firmatieren script
-    sudo wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
+    wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
 
     sudo chmod +x /opt/M122/scripts/log_formating.sh
     
     # Service file herunterladen
-    sudo wget -O /etc/systemd/system/log_formating.service https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.service > /dev/null 2>&1
+    wget -O /etc/systemd/system/log_formating.service https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.service > /dev/null 2>&1
 }
 
 # Funktion zum Installieren von Syncthing mit Docker Compose
 install_syncthing() {
     # Download docker-compose.yaml to /opt/M122/docker
-    sudo wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/docker-compose.yaml > /dev/null 2>&1
+    wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/docker-compose.yaml > /dev/null 2>&1
 
     # Run docker-compose up -d in /opt/M122/docker
     sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
-    sudo echo "Syncthing wird installiert. Bitte warten..."
-    sudo sleep 30  # Warte 30 Sekunden
+    echo "Syncthing wird installiert. Bitte warten..."
+    sleep 30  # Warte 30 Sekunden
 
 
     syncthing_folder_check=$(sudo docker exec -t syncthing syncthing cli config folders list | grep -o "monitoring")
@@ -91,14 +91,14 @@ install_syncthing() {
     if [ -z "$syncthing_folder_check" ]; then
         # Syncthing-Ordner erstellen
         sudo docker exec -t syncthing syncthing cli config folders add --id monitoring --label monitoring --path /var/syncthing --type sendonly --ignore-perms
-        sudo echo "Syncthing-Ordner 'monotoring' wurde erstellt. ✅"
+        echo "Syncthing-Ordner 'monotoring' wurde erstellt. ✅"
     else
-        sudo echo "Syncthing-Ordner 'monitoring' existiert bereits. ✅"
+        echo "Syncthing-Ordner 'monitoring' existiert bereits. ✅"
     fi
 
     # Zeige die Syncthing-Gerät-ID
     current_device_id=$(sudo docker exec -t syncthing syncthing --device-id)
-    sudo echo "❕ Dies ist Syncthing-Gerät-ID  bitte füge diese ID den nextcloud und grafana ein: $current_device_id"
+    echo "❕ Dies ist Syncthing-Gerät-ID  bitte füge diese ID den nextcloud und grafana ein: $current_device_id"
 
 
     # Benutzer nach der ID des Syncthing von Nextcloud fragen und Überprüfung der Eingabe
@@ -166,9 +166,9 @@ configure_email() {
 
     echo "E-Mail-Konfiguration erfolgreich gespeichert."
 
-    sudo systemctl start log_formating
+    systemctl start log_formating
     
-    sudo systemctl enable log_formating
+    systemctl enable log_formating
 }
 
 # Schritt 1: Installation von Docker und Docker Compose
