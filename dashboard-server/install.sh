@@ -19,11 +19,7 @@ docker_installation() {
             ca-certificates \
             curl \
             gnupg-agent \
-            software-properties-common \
-            jq \
-            ssmtp \
-            mailutils \
-            inotify-tools
+            software-properties-common
 
         # Install Docker
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
