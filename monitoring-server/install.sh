@@ -129,6 +129,7 @@ install_syncthing() {
     sudo docker exec -t syncthing syncthing cli config devices add --device-id "$dashboard_id" --name Dashboard --addresses dynamic
     echo "Gerät 'Dashboard' wurde zu Syncthing hinzugefügt. ✅"
 
+
         # Überprüfen, ob Gerät 'Dashboard' bereits mit dem Ordner 'Monitoring' geteilt ist
     if ! sudo docker exec -t syncthing syncthing cli config folders "nextcloud" devices list | grep -q "$dashboard_id"; then
         # Gerät 'Dashboard' zum Ordner 'Monitoring' hinzufügen
