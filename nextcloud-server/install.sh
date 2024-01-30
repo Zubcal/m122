@@ -1,4 +1,7 @@
 #!/bin/bash
+# Tittel: Nextcloud server installer
+# Author: Zubeyr Cali
+# Datum: 30.01.2024
 
 # Funktion zum Überprüfen und Ausgeben des Nextcloud-Status
 server_ip=$(hostname -I | awk '{print $1}')
