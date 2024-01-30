@@ -1,4 +1,7 @@
 #!/bin/bash
+# Tittel: Dashboard server installer
+# Author: Zubeyr Cali
+# Datum: 30.01.2024
 
 server_ip=$(hostname -I | awk '{print $1}')
 # Funktion zum Überprüfen, ob ein Befehl vorhanden ist
