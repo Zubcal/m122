@@ -16,7 +16,9 @@ Docker wird in diesem Projekt verwendet, um die Anwendungen in Containern zu iso
 ### Nextcloud
 
 Nextcloud ist eine Open-Source-Software für die Speicherung von Dateien, die auch Funktionen wie Kalender, Kontakte und mehr bietet.
+
 ![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/6/60/Nextcloud_Logo.svg)
+
 
 ### PostgreSQL ❤️
 
