@@ -1,4 +1,4 @@
-# Shell-Skript-Dokumentation
+# Shell-Skript-Dokumentation Für den Monitoring server
 
 ## Inhaltsverzeichnis
 1. [Einführung](#einführung)
@@ -36,10 +36,10 @@ Die Funktion `configure_email()` fordert den Benutzer auf, E-Mail-Konfigurations
 
 ## Bilder
 ### Syncthing
-![Syncthing](Pfad/zum/SyncthingBild.jpg)
+![Syncthing](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/SyncthingLogoHorizontal.svg/2560px-SyncthingLogoHorizontal.svg.png)
 - **Beschreibung:** Bild, das Syncthing während der Synchronisierung zeigt.
 
 ### Gmail
-![Gmail](Pfad/zum/GmailBild.jpg)
+![Gmail](https://1000logos.net/wp-content/uploads/2021/05/Gmail-logo.png)
 - **Beschreibung:** Bild, das die Gmail-Plattform zeigt, über die E-Mail-Benachrichtigungen gesendet werden.
 
