@@ -1,4 +1,7 @@
 #!/bin/bash
+# Tittel: Monitoring server installer
+# Author: Zubeyr Cali
+# Datum: 30.01.2024
 
 # Funktion zum Überprüfen, ob ein Befehl vorhanden ist
 command_exists() {
