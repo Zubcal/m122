@@ -9,10 +9,10 @@ command_exists() {
 docker_installation() {
     # Check if Docker is installed
     if ! command_exists docker; then
-        # Update the package list
+        # aktualisieren von der package list
         sudo apt update > /dev/null 2>&1
 
-        # Install required dependencies
+        # Installire notwendige zusatzsoftware
         sudo apt install -y \
             apt-transport-https \
             ca-certificates \
@@ -24,7 +24,7 @@ docker_installation() {
             mailutils \
             inotify-tools
 
-        # Install Docker
+        # Installire Docker
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
         sudo echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -37,9 +37,9 @@ docker_installation() {
         sudo echo "Docker ist bereits installiert. ✅"
     fi
 
-    # Check if Docker Compose is installed
+    # überprüfen ob docker installiert ist
     if ! command_exists docker-compose; then
-        # Install Docker Compose
+        # installire docker-compose
         sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
         sudo chmod +x /usr/local/bin/docker-compose
@@ -49,25 +49,26 @@ docker_installation() {
         echo "Docker Compose ist bereits installiert. ✅"
     fi
 
-    # Display Docker and Docker Compose versions
+    # zeige die version von docker & Docker-Compose an
     sudo docker --version
     sudo docker-compose --version
 }
 
 # Funktion zum Erstellen von Ordnern für Syncthing und Scripts
 create_folders() {
-    # Create folder for Syncthing
+    # erstelle einen Ornder syncthing
     mkdir -p /opt/M122/syncthing
 
-    # Create folder for scripts
+    # erstelle einen Ornder scripts
     mkdir -p /opt/M122/scripts
 
-    # Ensure that the docker folder exists
+    # erstelle einen Ornder docker
     mkdir -p /opt/M122/docker
 
     # installieren von dem log firmatieren script
     wget -O /opt/M122/scripts/log_formating.sh https://raw.githubusercontent.com/Zubcal/m122/main/monitoring-server/log_formating.sh > /dev/null 2>&1
 
+    # das script ausfübar machen
     sudo chmod +x /opt/M122/scripts/log_formating.sh
 
     # Service file herunterladen
@@ -106,6 +107,7 @@ install_syncthing() {
         fi
     done
 
+    # füge das Gerät Nextcloud ein und akzeptiere alle ordner die das Gerät mit diesem gerät teilt
 
     sudo docker exec -t syncthing syncthing cli config devices add --device-id "$nexcloud_id" --name nextcloud --addresses dynamic --auto-accept-folders
     sleep 30
@@ -125,14 +127,14 @@ install_syncthing() {
     done
 
 
-
+    # füge das Gerät Dashboard ein
     sudo docker exec -t syncthing syncthing cli config devices add --device-id "$dashboard_id" --name Dashboard --addresses dynamic
     echo "Gerät 'Dashboard' wurde zu Syncthing hinzugefügt. ✅"
 
 
-        # Überprüfen, ob Gerät 'Dashboard' bereits mit dem Ordner 'Monitoring' geteilt ist
+        # Überprüfen, ob Gerät 'Dashboard' bereits mit dem Ordner 'Nextcloud' geteilt ist
     if ! sudo docker exec -t syncthing syncthing cli config folders "nextcloud" devices list | grep -q "$dashboard_id"; then
-        # Gerät 'Dashboard' zum Ordner 'Monitoring' hinzufügen
+        # Gerät 'Dashboard' zum Ordner 'Nextcloud' hinzufügen
         sudo docker exec -t syncthing syncthing cli config folders "nextcloud" devices add --device-id "$dashboard_id"
         echo "Gerät 'Dashboard' wurde zum Ordner 'Nextcloud' hinzugefügt. ✅"
     else
@@ -164,6 +166,7 @@ configure_email() {
         echo "AuthPass=$email_password" | sudo tee -a /etc/ssmtp/ssmtp.conf > /dev/null
     fi
 
+    # auskommentieren dieser zeile unten
     sudo sed -i 's/^#FromLineOverride=YES/FromLineOverride=YES/' /etc/ssmtp/ssmtp.conf
 
     # E-Mail-Adressen in das andere Skript einfügen
