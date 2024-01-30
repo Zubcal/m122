@@ -34,6 +34,9 @@ Die Funktion `install_syncthing()` lädt eine Docker-Compose-Datei von einem Git
 ## Konfiguration von E-Mails mit sSMTP
 Die Funktion `configure_email()` fordert den Benutzer auf, E-Mail-Konfigurationsdetails einzugeben, um sSMTP zu konfigurieren. Diese Details werden dann in der Konfigurationsdatei von sSMTP gespeichert und an ein Skript (`log_formating.sh`) übergeben, um E-Mail-Benachrichtigungen zu ermöglichen.
 
+## Überwachung der Log-Dateien
+Das Skript `watch_logs.sh` überwacht bestimmte Log-Dateien in Echtzeit und benachrichtigt per E-Mail über Warnungen oder Fehler. Es überwacht die Dateien `audit.log` und `nextcloud.log` im Ordner `/opt/M122/syncthing/nextcloud-logs/nextcloud/`. Bevor das Skript ausgeführt wird, müssen die Pfade zu den Log-Dateien entsprechend gesetzt werden.
+
 ## Bilder
 ### Syncthing
 ![Syncthing](https://github.com/Zubcal/m122/assets/127558095/0de2d4a3-3cbc-473c-a139-4e5f1e3dab9e)
