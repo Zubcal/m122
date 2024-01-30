@@ -41,6 +41,6 @@ Die Funktion `configure_email()` fordert den Benutzer auf, E-Mail-Konfigurations
 
 ### Gmail
 ![Gmail](![Gmail_Logo_24px](https://github.com/Zubcal/m122/assets/127558095/32c7f32c-66ce-44fc-84bf-f2f073bb4690)
-)
+
 - **Beschreibung:** Bild, das die Gmail-Plattform zeigt, über die E-Mail-Benachrichtigungen gesendet werden.
 
