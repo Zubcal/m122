@@ -17,14 +17,10 @@ Docker wird in diesem Projekt verwendet, um die Anwendungen in Containern zu iso
 
 Nextcloud ist eine Open-Source-Software für die Speicherung von Dateien, die auch Funktionen wie Kalender, Kontakte und mehr bietet.
 
-![Nextcloud](https://upload.wikimedia.org/wikipedia/commons/6/60/Nextcloud_Logo.svg)
-
 
 ### PostgreSQL ❤️
 
 PostgreSQL wird als Datenbank verwendet, um die Nextcloud-Daten zu speichern.
-
-![postgresql-icon](https://github.com/Zubcal/m122/assets/127558095/a971a701-7ca6-4304-898b-dc67a559c23d)
 
 
 
@@ -41,7 +37,7 @@ Syncthing ist ein Open-Source-Tool für die Dateisynchronisierung zwischen Gerä
 ### jq
 
 jq ist ein CMD Tool für die Datenmanipulation in JSON-Format. (nextcloud schreibt die logs in Json Format)
-![jq](jq.png)
+
 
 ### Promtail, Loki und Grafana
 
@@ -50,8 +46,6 @@ Promtail ist ein Agent für das Loggen von Anwendungen und sendet die Protokolle
 
 
 ## Architektur
-
-![Architekturdiagramm](architektur.png)
 
 Die Architektur umfasst folgende Schritte:
 
