@@ -143,9 +143,9 @@ else
     echo "Docker ist bereits installiert. ✅"
 fi
 
-# Check if Docker Compose is installed
+# überprüfen ob Docker Compose installiert ist
 if ! command -v docker-compose &> /dev/null; then
-    # Install Docker Compose
+    # Installere Docker Compose
     sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
     sudo chmod +x /usr/local/bin/docker-compose
@@ -155,40 +155,40 @@ else
     echo "Docker Compose ist bereits installiert. ✅"
 fi
 
-# Display Docker and Docker Compose versions
+# zeige die verion von Docker and Docker Compose an
 docker --version
 docker-compose --version
 
 sudo mkdir -p /opt/M122
 
-# Create subdirectories nextcloud and docker inside /opt/M122
+# erstekke ein Unterornder nextcloud und der ornder docker in /opt/M122
 sudo mkdir -p /opt/M122/nextcloud
 sudo mkdir -p /opt/M122/docker
 
-# Create subdirectories data, logs, and docker inside /opt/M122/nextcloud
+# erstelle Unterordner data, logs, und docker in /opt/M122/nextcloud
 sudo mkdir -p /opt/M122/nextcloud/data
 sudo mkdir -p /opt/M122/nextcloud/config
 sudo mkdir -p /opt/M122/nextcloud/docker
 
-# Download the docker-compose.yaml file to /opt/M122/docker
+# herunterladen der docker-compose.yaml datei in /opt/M122/docker
 sudo wget -O /opt/M122/docker/docker-compose.yaml https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/docker-compose.yaml > /dev/null 2>&1
 
-# Download the .env file to /opt/M122/docker
+# herunterladen der .env datei in /opt/M122/docker
 sudo wget -O /opt/M122/docker/.env https://raw.githubusercontent.com/Zubcal/m122/main/nextcloud-server/.env > /dev/null 2>&1
 
-# Download the docker-entrypoint.sh file to /opt/M122/nextcloud/docker
+# herunterladen der docker-entrypoint.sh datei in /opt/M122/nextcloud/docker
 sudo wget -O /opt/M122/nextcloud/docker/docker-entrypoint.sh https://github.com/Zubcal/m122/blob/main/nextcloud-server/docker-entrypoint.sh > /dev/null 2>&1
 
 # Überprüfen, ob das Docker-Netzwerk namens "nextcloud" existiert
 if ! sudo docker network inspect nextcloud &> /dev/null; then
-    # Das Netzwerk existiert nicht, erstelle es
+    # Das Netzwerk existiert nicht, erstelle eins
     sudo docker network create nextcloud
 fi
 
-# Run docker-compose up -d in /opt/M122/docker
+# füre die datei docker-compose.yaml aus
 sudo docker-compose -f /opt/M122/docker/docker-compose.yaml up -d
 
-# Endlosschleife für die Überprüfung alle 3 Minuten
+# Endlosschleife für die Überprüfung alle 5 sekunden ob nextcloud installiert ist
 while true; do
     check_nextcloud_status
 
