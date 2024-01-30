@@ -8,7 +8,8 @@
 5. [Erstellen von Ordnern für Syncthing und Skripte](#erstellen-von-ordnern-für-syncthing-und-skripte)
 6. [Installieren von Syncthing mit Docker Compose](#installieren-von-syncthing-mit-docker-compose)
 7. [Konfiguration von E-Mails mit sSMTP](#konfiguration-von-e-mails-mit-ssmtp)
-8. [Bilder](#bilder)
+8. [Überwachung der Log-Dateien](#überwachung-der-log-dateien)
+9. [Bilder](#bilder)
 
 ## Einführung
 Dieses Shell-Skript automatisiert die Installation und Konfiguration von Docker, Docker Compose, Syncthing und sSMTP für die Verwendung in einem Überwachungssystem. Es bietet auch die Möglichkeit, E-Mail-Benachrichtigungen über sSMTP zu konfigurieren.
