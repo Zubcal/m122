@@ -52,9 +52,9 @@ Die Ausführung des gesamten Skripts erfolgt durch Aufruf des Hauptteils am Ende
 
 Hier ist ein Screenshot des Grafana-Dashboards das ich zusammengebaut habe: 
 ![Grafana Dashboard Screenshot](https://github.com/Zubcal/m122/assets/127558095/eeeac073-f25e-4c22-b2a2-7a77096e6461)
-(Pfad/zum/Screenshot.png)
+
 
 ## Herunterladen der Konfigurationsdateien
 
-Die Konfigurationsdateien für Loki und Promtail werden heruntergeladen, um sicherzustellen, dass die Docker-Container mit den richtigen Konfigurationen gestartet werden können. Diese Dateien enthalten Einstellungen und Konfigurationen für Loki, das für das Sammeln, Speichern und Abfragen von Protokollen verwendet wird, sowie für Promtail, das für das Sammeln und Weiterleiten von Protokollen an Loki zuständig ist. ohne das Herunterladen und dieser Konfigurationsdateien wird werder Promtail noch loki funtkionieren.
+Die Konfigurationsdateien für Loki und Promtail werden heruntergeladen, um sicherzustellen, dass die Docker-Container mit den richtigen Konfigurationen gestartet werden können. Diese Dateien enthalten Einstellungen und Konfigurationen für Loki, das für das Sammeln, Speichern und Abfragen von Protokollen verwendet wird, sowie für Promtail, das für das Sammeln und Weiterleiten von Protokollen an Loki zuständig ist. ohne das Herunterladen und dieser Konfigurationsdateien wird werder Promtail noch Loki funtkionieren.
 
