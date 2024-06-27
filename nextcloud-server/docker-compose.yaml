@@ -49,4 +49,4 @@ services:
       - POSTGRES_HOST=db
     ports:
       - 1880:80
-    restart: unless-stopped
+    restart: never
